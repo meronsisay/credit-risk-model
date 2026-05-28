@@ -6,12 +6,12 @@ An End-to-End Implementation for Building, Deploying, and Automating a Credit Ri
 
 ## Credit Scoring Business Understanding
 
-### 1. How does the Basel II Accord influence the need for an interpretable and well-documented model?
+### 1. Basel II, Interpretability, and Documentation
 
 The **Basel II Accord** emphasizes accurate risk measurement, transparency, and regulatory accountability in credit risk modeling.
 
 | Pillar | Focus | Modeling Implication |
-|---|---|---|
+|--------|-------|---------------------|
 | **Pillar 1** | Minimum Capital Requirements | Banks must estimate Probability of Default (PD), LGD, and EAD |
 | **Pillar 2** | Supervisory Review | Models must be validated, documented, and auditable |
 | **Pillar 3** | Market Discipline | Risk processes must be transparent to stakeholders |
@@ -26,7 +26,7 @@ Highly interpretable models such as Logistic Regression with Weight of Evidence 
 
 ---
 
-### 2. Why is a proxy variable necessary, and what risks does it introduce?
+### 2. Proxy Variables: Necessity and Risks
 
 Traditional credit scoring relies on observed default behavior, such as missed repayments or loan delinquency. However, this dataset contains only transaction records and fraud indicators, with no direct default label.
 
@@ -35,7 +35,7 @@ To train a supervised machine learning model, a **proxy target variable** must b
 While necessary, proxy-based prediction introduces several business risks:
 
 | Risk | Description |
-|---|---|
+|------|-------------|
 | **Measurement Error** | Proxy labels may not perfectly represent actual default behavior |
 | **Regulatory Risk** | Regulators may challenge weakly justified proxy definitions |
 | **Bias & Fairness** | Behavioral features may unintentionally correlate with protected groups |
@@ -46,10 +46,10 @@ To reduce these risks, proxy definitions should be carefully documented, monitor
 
 ---
 
-### 3. Trade-offs between interpretable and high-performance models
+### 3. Model Trade-offs in a Regulated Context
 
 | Dimension | Logistic Regression + WoE | Gradient Boosting |
-|---|---|---|
+|-----------|--------------------------|-------------------|
 | **Interpretability** | High and regulator-friendly | Lower; requires SHAP/LIME explanations |
 | **Performance** | Moderate | Typically higher predictive accuracy |
 | **Regulatory Acceptance** | Strong industry standard | Requires additional validation |
@@ -65,5 +65,3 @@ For Bati Bank, a practical strategy is to:
 3. Adopt the more complex model only if it provides significant performance gains with acceptable explainability and documentation
 
 This approach balances regulatory safety with predictive performance.
-
----
