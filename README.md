@@ -16,33 +16,22 @@ The **Basel II Accord** emphasizes accurate risk measurement, transparency, and 
 | **Pillar 2** | Supervisory Review | Models must be validated, documented, and auditable |
 | **Pillar 3** | Market Discipline | Risk processes must be transparent to stakeholders |
 
-Because lending decisions affect both customers and regulatory capital, banks must understand and explain how predictions are made. This creates a strong need for:
-
-- **Interpretability** — understanding how features influence risk predictions
-- **Documentation** — recording assumptions, data sources, validation, and monitoring procedures
-- **Reproducibility** — enabling independent audits and validation
-
-Highly interpretable models such as Logistic Regression with Weight of Evidence (WoE) are commonly preferred because they align well with Basel II transparency and governance requirements.
+**Key requirements:** Interpretability, documentation, and reproducibility are mandatory for regulatory compliance. Logistic Regression with WoE is preferred for its transparency.
 
 ---
 
 ### 2. Proxy Variables: Necessity and Risks
 
-Traditional credit scoring relies on observed default behavior, such as missed repayments or loan delinquency. However, this dataset contains only transaction records and fraud indicators, with no direct default label.
+**Why a proxy is needed:** The dataset contains only transaction records — no direct default label exists.
 
-To train a supervised machine learning model, a **proxy target variable** must be created. In this project, customer behavior metrics such as **Recency, Frequency, and Monetary (RFM)** patterns are used to estimate credit risk.
+**Our approach:** Create a proxy target using RFM (Recency, Frequency, Monetary) analysis to identify high-risk customers.
 
-While necessary, proxy-based prediction introduces several business risks:
-
-| Risk | Description |
+| Risk | Mitigation |
 |------|-------------|
-| **Measurement Error** | Proxy labels may not perfectly represent actual default behavior |
-| **Regulatory Risk** | Regulators may challenge weakly justified proxy definitions |
-| **Bias & Fairness** | Behavioral features may unintentionally correlate with protected groups |
-| **Model Drift** | Customer behavior patterns may change over time |
-| **Business Misalignment** | High engagement does not always imply creditworthiness |
-
-To reduce these risks, proxy definitions should be carefully documented, monitored, and validated against real repayment data when available.
+| Measurement Error | Validate against real data when available |
+| Regulatory Risk | Document proxy rationale thoroughly |
+| Bias & Fairness | Test for disparate impact |
+| Model Drift | Implement monitoring and retraining |
 
 ---
 
@@ -50,18 +39,62 @@ To reduce these risks, proxy definitions should be carefully documented, monitor
 
 | Dimension | Logistic Regression + WoE | Gradient Boosting |
 |-----------|--------------------------|-------------------|
-| **Interpretability** | High and regulator-friendly | Lower; requires SHAP/LIME explanations |
-| **Performance** | Moderate | Typically higher predictive accuracy |
-| **Regulatory Acceptance** | Strong industry standard | Requires additional validation |
-| **Complexity** | Simple to deploy and maintain | More complex tuning and monitoring |
-| **Overfitting Risk** | Lower | Higher without careful tuning |
-| **Scorecard Conversion** | Easy | More difficult |
+| Interpretability | High | Low (requires SHAP/LIME) |
+| Performance | Moderate | High |
+| Regulatory Acceptance | Strong | Requires extra validation |
 
-In regulated financial environments, institutions must balance predictive performance with explainability, fairness, and compliance.
+**Recommended Strategy:** Start with Logistic Regression + WoE as baseline, benchmark against Gradient Boosting, and adopt complex model only if performance gain >5% with acceptable explainability.
 
-For Bati Bank, a practical strategy is to:
-1. Use **Logistic Regression + WoE** as a transparent baseline model
-2. Compare it with **Gradient Boosting** models
-3. Adopt the more complex model only if it provides significant performance gains with acceptable explainability and documentation
+---
 
-This approach balances regulatory safety with predictive performance.
+## EDA Summary
+
+### Dataset Overview
+| Metric | Value |
+|--------|-------|
+| Total transactions | 95,662 |
+| Total customers | 3,742 |
+| Time period | 90 days (Nov 15, 2018 - Feb 13, 2019) |
+| Missing values | None |
+
+### Key Findings
+
+| # | Finding | Action |
+|---|---------|--------|
+| 1 | Fraud rate: 0.2% (193 transactions) | Use SMOTE or class weights |
+| 2 | Amount: mean 6,718, median 1,000 (highly skewed) | Apply log transform |
+| 3 | 40% of transactions are negative (refunds) | Create `refund_rate` feature |
+| 4 | Friday volume doubles other days | Create `is_friday` flag |
+| 5 | Top 10% customers drive 63% of volume | Cap or log-transform customer aggregates |
+| 6 | Amount vs Value: 0.99 correlation | **Drop Value column** |
+| 7 | Provider 3: 2.08% fraud rate | Keep ProviderId as feature |
+| 8 | Channel 1: 0.74% fraud rate | Keep ChannelId as feature |
+
+---
+
+## Environment Setup
+
+### Prerequisites
+- Python 3.11+
+- Git
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/meronsisay/credit-risk-model.git
+cd credit-risk-model
+
+# Create virtual environment
+python -m venv venv
+
+# Activate it
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+jupyter notebook notebooks/eda.ipynb
