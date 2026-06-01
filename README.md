@@ -96,7 +96,7 @@ The **Basel II Accord** emphasizes accurate risk measurement, transparency, and 
 ### Leakage Prevention
 RFM features (recency, frequency, monetary) used only for target creation, excluded from predictors.
 
-## Model Performance (Best by Recall)
+## Model Performance
 
 | Model | Recall | ROC-AUC | F1 | Precision | Accuracy |
 |-------|--------|---------|-----|-----------|----------|
@@ -114,7 +114,32 @@ RFM features (recency, frequency, monetary) used only for target creation, exclu
 - `models/feature_pipeline.pkl` - Feature engineering pipeline
 - `models/best_model.pkl` - Best trained model
 
+## Project Structure
 
+```
+credit-risk-model/
+├── data/
+│   ├── raw/
+│   │   └── data.csv              # Raw transactions
+│   └── processed/
+│       └── processed_data.csv    # Model-ready data with target
+├── models/
+│   ├── best_model.pkl             # Best trained model
+│   ├── feature_pipeline.pkl       # Fitted feature pipeline
+│   ├── mlflow.db                  # MLflow SQLite database
+│   └── mlruns/                    # MLflow artifacts
+├── src/
+│   ├── data_processing.py         # Feature engineering + target creation
+│   └── train.py                   # Model training + MLflow tracking
+├── tests/
+│   └── test_data_processing.py    # Unit tests
+├── notebooks/
+│   └── eda.ipynb                  # Exploratory analysis
+├── requirements.txt
+├── .gitignore
+└── README.md
+
+```
 
 
 ## Environment Setup
@@ -156,7 +181,7 @@ python src/data_processing.py
 python src/train.py
 
 # Launch MLflow UI to view results
-mlflow ui
+mlflow ui --backend-store-uri sqlite:///models/mlflow.db
 
 # View EDA notebook
 jupyter notebook notebooks/eda.ipynb
