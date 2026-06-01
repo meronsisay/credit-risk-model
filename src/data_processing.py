@@ -192,7 +192,9 @@ class HighRiskTargetCreator(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         if self.kmeans is None:
-            raise RuntimeError("Target engine state uninitialized. Run fit stage first.")
+            raise RuntimeError(
+                "Target engine state uninitialized. Run fit stage first."
+            )
 
         rfm = X[["recency", "frequency", "monetary"]].copy()
         rfm["frequency_log"] = np.log1p(rfm["frequency"])
@@ -490,9 +492,7 @@ class FeaturePipeline(BaseEstimator, TransformerMixin):
 
         # Apply WoE transformation
         if self.apply_woe and self.woe_calculator is not None:
-            woe_input = raw_features[
-                self.numerical_cols + self.categorical_cols
-            ].copy()
+            woe_input = raw_features[self.numerical_cols + self.categorical_cols].copy()
             woe_features = self.woe_calculator.transform(woe_input)
             final_features = pd.concat([final_features, woe_features], axis=1)
 
@@ -507,7 +507,9 @@ class FeaturePipeline(BaseEstimator, TransformerMixin):
         return None
 
 
-def process_data(df, create_target=False, apply_woe=False, n_clusters=3, random_state=42):
+def process_data(
+    df, create_target=False, apply_woe=False, n_clusters=3, random_state=42
+):
     pipeline = FeaturePipeline(
         create_target=create_target,
         apply_woe=apply_woe,
@@ -536,7 +538,9 @@ def main():
         df, create_target=True, apply_woe=True, n_clusters=3, random_state=42
     )
 
-    print(f"\nFinal Matrix: {features.shape[0]:,} customers, {features.shape[1]} features.")
+    print(
+        f"\nFinal Matrix: {features.shape[0]:,} customers, {features.shape[1]} features."
+    )
 
     if "is_high_risk" in features.columns:
         counts = features["is_high_risk"].value_counts()
@@ -558,7 +562,6 @@ def main():
     joblib.dump(pipeline, pipeline_path)
     print(f"Saved: {pipeline_path}")
 
-    
 
 if __name__ == "__main__":
     main()
