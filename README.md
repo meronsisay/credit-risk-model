@@ -72,6 +72,47 @@ The **Basel II Accord** emphasizes accurate risk measurement, transparency, and 
 
 ---
 
+## Data Processing Pipeline
+
+### Feature Engineering Output
+
+| Metric | Value |
+|--------|-------|
+| Customers processed | 3,742 |
+| Final features | 47 |
+| High-risk target (is_high_risk) | 31.80% (1,190 customers) |
+| Low-risk (0) | 68.20% (2,552 customers) |
+
+### Proxy Target Creation (RFM + K-Means)
+
+| Cluster | Size | Recency (days) | Frequency | Monetary (UGX) | Risk |
+|---------|------|----------------|-----------|----------------|------|
+| 0 | 1,208 | 18.3 | 4.5 | 29,054 | Low |
+| 1 | 1,344 | 11.5 | 62.9 | 521,308 | Low |
+| 2 | 1,190 | 64.3 | 4.8 | 47,951 | **High** |
+
+**High-risk cluster identified:** Cluster 2 (highest recency, lowest frequency)
+
+### Information Value (IV) - Top Features
+
+| Feature | IV | Predictive Power |
+|---------|-----|------------------|
+| refund_amount | 0.8182 | STRONG |
+| unique_providerid | 0.6515 | STRONG |
+| refund_rate | 0.6483 | STRONG |
+| transaction_hour_std | 0.5774 | STRONG |
+| unique_productcategory | 0.5469 | STRONG |
+
+### Leakage Prevention
+RFM features (recency, frequency, monetary) used only for target creation, excluded from predictors.
+
+### Output Files
+
+- `data/processed/processed_data.csv` - Model-ready dataset with `is_high_risk` target
+- `models/feature_pipeline.pkl` - Fitted pipeline for inference
+
+
+
 ## Environment Setup
 
 ### Prerequisites
