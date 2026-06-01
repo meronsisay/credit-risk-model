@@ -96,10 +96,24 @@ The **Basel II Accord** emphasizes accurate risk measurement, transparency, and 
 ### Leakage Prevention
 RFM features (recency, frequency, monetary) used only for target creation, excluded from predictors.
 
-### Output Files
+## Model Performance (Best by Recall)
 
-- `data/processed/processed_data.csv` - Model-ready dataset with `is_high_risk` target
-- `models/feature_pipeline.pkl` - Fitted pipeline for inference
+| Model | Recall | ROC-AUC | F1 | Precision | Accuracy |
+|-------|--------|---------|-----|-----------|----------|
+| **Gradient Boosting (Baseline)** | **0.6022** | 0.8160 | 0.6039 | 0.6056 | 0.7489 |
+| Logistic Regression (WoE) | 0.5462 | 0.7874 | 0.5516 | 0.5571 | 0.7177 |
+| Random Forest (Tuned) | 0.5014 | 0.8139 | 0.5491 | 0.6068 | 0.7382 |
+
+**Selected Model:** Gradient Boosting Baseline (Recall 60% → catches 60 of 100 high-risk customers)
+
+**Registered in MLflow:** `CreditRiskModel` (Version 5)
+
+## Output Files
+
+- `data/processed/processed_data.csv` - Model-ready dataset
+- `models/feature_pipeline.pkl` - Feature engineering pipeline
+- `models/best_model.pkl` - Best trained model
+
 
 
 
@@ -109,7 +123,7 @@ RFM features (recency, frequency, monetary) used only for target creation, exclu
 - Python 3.11+
 - Git
 
-### Installation
+### Installation & Setup
 
 ```bash
 # Clone repository
@@ -126,6 +140,23 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
+# Create necessary directories
+mkdir -p data/raw data/processed 
+
+# Download data (if not present)
+# Place data.csv in data/raw/
+
+# Run feature engineering 
+python src/data_processing.py
+
+# Run model training 
+python src/train.py
+
+# Launch MLflow UI to view results
+mlflow ui
+
+# View EDA notebook
 jupyter notebook notebooks/eda.ipynb
