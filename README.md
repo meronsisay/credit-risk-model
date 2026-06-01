@@ -93,16 +93,6 @@ The **Basel II Accord** emphasizes accurate risk measurement, transparency, and 
 
 **High-risk cluster identified:** Cluster 2 (highest recency, lowest frequency)
 
-### Information Value (IV) - Top Features
-
-| Feature | IV | Predictive Power |
-|---------|-----|------------------|
-| refund_amount | 0.8182 | STRONG |
-| unique_providerid | 0.6515 | STRONG |
-| refund_rate | 0.6483 | STRONG |
-| transaction_hour_std | 0.5774 | STRONG |
-| unique_productcategory | 0.5469 | STRONG |
-
 ### Leakage Prevention
 RFM features (recency, frequency, monetary) used only for target creation, excluded from predictors.
 
