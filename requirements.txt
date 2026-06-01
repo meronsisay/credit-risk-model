@@ -9,6 +9,9 @@ ipykernel
 # Experiment tracking
 mlflow==2.8.1
 
+xverse
+woe
+
 # API & deployment
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
