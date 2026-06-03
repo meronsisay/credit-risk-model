@@ -106,19 +106,35 @@ RFM features (recency, frequency, monetary) used only for target creation, exclu
 
 **Selected Model:** Gradient Boosting Baseline (Recall 60% → catches 60 of 100 high-risk customers)
 
-**Registered in MLflow:** `CreditRiskModel` (Version 5)
+**Registered in MLflow:** `CreditRiskModel` (Version 3)
+
+## API Deployment 
+
+### FastAPI Service
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check |
+| `/model/info` | GET | Model metadata |
+| `/predict` | POST | Single customer risk prediction |
+| `/predict/batch` | POST | Batch predictions |
+
 
 ## Output Files
 
 - `data/processed/processed_data.csv` - Model-ready dataset
 - `models/feature_pipeline.pkl` - Feature engineering pipeline
 - `models/best_model.pkl` - Best trained model
+- `models/mlflow.db` - MLflow tracking database
 
 ## Project Structure
 
 ```
 credit-risk-model/
-├── data/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # CI/CD pipeline (lint + test)
+├── data/                 (git)
 │   ├── raw/
 │   │   └── data.csv              # Raw transactions
 │   └── processed/
@@ -129,12 +145,18 @@ credit-risk-model/
 │   ├── mlflow.db                  # MLflow SQLite database
 │   └── mlruns/                    # MLflow artifacts
 ├── src/
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── main.py                # FastAPI application
+│   │   └── pydantic_models.py     # Request/response validation
 │   ├── data_processing.py         # Feature engineering + target creation
 │   └── train.py                   # Model training + MLflow tracking
 ├── tests/
-│   └── test_data_processing.py    # Unit tests
+│   ├── test_data_processing.py    # Unit tests
 ├── notebooks/
 │   └── eda.ipynb                  # Exploratory analysis
+├── Dockerfile                      # Container configuration
+├── docker-compose.yml              # Multi-service orchestration
 ├── requirements.txt
 ├── .gitignore
 └── README.md
@@ -147,6 +169,7 @@ credit-risk-model/
 ### Prerequisites
 - Python 3.11+
 - Git
+- Docker Desktop
 
 ### Installation & Setup
 
@@ -183,5 +206,47 @@ python src/train.py
 # Launch MLflow UI to view results
 mlflow ui --backend-store-uri sqlite:///models/mlflow.db
 
-# View EDA notebook
-jupyter notebook notebooks/eda.ipynb
+# Run FastAPI Locally
+uvicorn src.api.main:app --reload
+
+# Test the API:
+
+# Health check
+curl http://localhost:8000/health
+
+# Model info
+curl http://localhost:8000/model/info
+
+# Make a prediction
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "avg_amount": 1500,
+    "std_amount": 500,
+    "weekend_ratio": 0.3,
+    "business_hour_ratio": 0.7,
+    "transaction_hour_std": 2.5,
+    "unique_productcategory": 3,
+    "unique_channelid": 2,
+    "unique_providerid": 2,
+    "cat_airtime": 1
+  }'
+
+# View interactive API documentation
+# Open http://localhost:8000/docs in your browser
+
+# Build Docker image
+docker build -t credit-risk-api .
+
+# Run with Docker
+docker run -p 8000:8000 credit-risk-api
+
+# Or use Docker Compose (API + MLflow UI)
+docker-compose up --build
+
+# Run Tests & Linter
+# Run unit tests
+pytest tests/ -v
+
+# Run linter
+flake8 src/ tests/ --max-line-length=120

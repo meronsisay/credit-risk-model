@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  credit-risk-api:
+    build: .
+    container_name: credit-risk-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      # ADJUSTMENT: Pass the explicit container tracking path to your FastAPI app
+      - MLFLOW_TRACKING_URI=sqlite:///app/models/mlflow.db
+    volumes:
+      - ./models:/app/models
+      - ./mlruns:/app/mlruns
+    restart: unless-stopped
+
+  mlflow-ui:
+    # ADJUSTMENT: Reuse your local build image instead of pulling a blank python image
+    build: .
+    container_name: mlflow-ui
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./models:/app/models
+      - ./mlruns:/app/mlruns
+  
+    command: mlflow ui --backend-store-uri sqlite:////app/models/mlflow.db --host 0.0.0.0 --port 5000
+    restart: unless-stopped
+
